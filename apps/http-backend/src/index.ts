@@ -83,16 +83,24 @@ app.post("/room", middleware, async (req, res) => {
     }
     const userId = (req as JwtPayload).userId
 
-    await prismaClient.room.create({
-        data:{
-            slug: parsedData.data.name,
-            adminId: userId
-        }
-    })
+    try{
+        const room = await prismaClient.room.create({
+            data:{
+                slug: parsedData.data.name,
+                adminId: userId
+            }
+        })
+        res.json({
+            roomId: room.id
+        })
 
-    res.json({
-        roomId: 123
-    })
+    } catch(e) {
+        res.status(411).json({
+            message: "Room already exists with this name"
+        })
+    }
+
+
 
 })
 
